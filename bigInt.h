@@ -104,6 +104,16 @@ public:
         normalize();
     }
 
+    std::string to_string() const {
+        if (is_zero()) return "0";
+        std::ostringstream oss;
+        if (neg) oss << "-";
+        for (int i = limbs.size() - 1; i >= 0; --i) {
+            oss << limbs[i];
+        }
+        return oss.str();
+    }
+
     std::string to_hex_string() const {
         std::ostringstream oss;
         oss << std::hex << std::uppercase;
@@ -418,5 +428,24 @@ public:
     BigInt& operator/=(const BigInt& o) { *this = *this / o; return *this; }
     BigInt& operator%=(const BigInt& o) { *this = *this % o; return *this; }
 };
+
+BigInt powMod(BigInt base, BigInt exp, const BigInt& mod) {
+    BigInt result(1);
+    base %= mod;
+    if (base.neg) base += mod;  // Ensure base is positive
+    while (exp > 0) {
+        if (!exp.is_even()) {
+            result = (result * base) % mod;
+            if (result.neg) result += mod;  // Ensure result is positive
+        }
+        exp = exp >> 1; // exp /= 2
+        base = (base * base) % mod;
+        if (base.neg) base += mod;  // Ensure base is positive
+    }
+    return result;
+}
+
+
+
 
 #endif // BIGINT_H
