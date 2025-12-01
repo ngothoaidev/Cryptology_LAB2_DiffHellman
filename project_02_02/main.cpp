@@ -7,8 +7,8 @@ int main(int argc, char* argv[]) {
     }
 
     // File Paths
-    const std::string inputFileName = "data\\Project_02_DiscreteLogarithm\\project_02_02\\test_00.inp";
-    const std::string outputFileName = "test_00.out";
+    const std::string inputFileName = argv[1];
+    const std::string outputFileName = argv[2];
     
     // Open input and output file
     std::ifstream inputFile(inputFileName);
@@ -30,23 +30,18 @@ int main(int argc, char* argv[]) {
     std::string num1, num2, num3, num4;
     inputFile >> num1 >> num2 >> num3 >> num4;
 
-    reverse(num1.begin(), num1.end());
-    reverse(num2.begin(), num2.end());
-    reverse(num3.begin(), num3.end());
-    reverse(num4.begin(), num4.end());
-
     BigInt p(num1); // prime number p
-    BigInt a(num2); // number a
-    BigInt b(num3); // number b
-    BigInt g(num4); // primitive root g
+    BigInt g(num2); // primitive root g
+    BigInt a(num3); // Alice's private key a
+    BigInt b(num4); // Bob's private key b
     inputFile.close();
 
     // Output Results
     std::cout << "Input Data:\n";
-    std::cout << "p: " << p.to_string() << std::endl;
-    std::cout << "a: " << a.to_string() << std::endl;
-    std::cout << "b: " << b.to_string() << std::endl;
-    std::cout << "g: " << g.to_string() << std::endl;
+    std::cout << "p: " << p.to_hex_string() << std::endl;
+    std::cout << "g: " << g.to_hex_string() << std::endl;
+    std::cout << "a: " << a.to_hex_string() << std::endl;
+    std::cout << "b: " << b.to_hex_string() << std::endl;
 
     // outputFile << p.to_string() << std::endl;
     // outputFile << a.to_string() << std::endl;
@@ -56,6 +51,7 @@ int main(int argc, char* argv[]) {
     BigInt B = powMod(g, b, p); // B = g^b
     BigInt sharedKeyA = powMod(B, a, p); // sharedKeyA = B^a mod p
     BigInt sharedKeyB = powMod(A, b, p); // sharedKeyB = A^b mod p
+
 
     if (sharedKeyA != sharedKeyB) {
         std::cerr << "Error: Shared keys do not match!\n";

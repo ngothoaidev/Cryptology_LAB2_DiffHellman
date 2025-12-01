@@ -7,8 +7,8 @@ int main(int argc, char* argv[]) {
     }
 
     // File Paths
-    const std::string inputFileName = "data\\Project_02_DiscreteLogarithm\\project_02_01\\test_01.inp";
-    const std::string outputFileName = "test_00.out";
+    const std::string inputFileName  = argv[1];
+    const std::string outputFileName = argv[2];
     
     // Open input and output file
     std::ifstream inputFile(inputFileName);
@@ -29,20 +29,17 @@ int main(int argc, char* argv[]) {
     // Read Data
     std::string num1, num2, num4;
     inputFile >> num1 >> num2;
-    reverse(num1.begin(), num1.end());
-    reverse(num2.begin(), num2.end());
+    
     std::vector<BigInt> arr; // Array to store n numbers of U(prime)
     BigInt prime(num1); // prime number p
     BigInt n(num2); // n numbers in U(prime)
-    int count = std::stoi(num2, nullptr, 16); // Convert hex string to integer
+    int count = stoi(n.to_string()); // Convert BigInt n to int count
     for(int i = 0; i < count; i++) {
         std::string singleNum;
         inputFile >> singleNum; // Read each number in U(prime) in one line and store it in the array
-        reverse(singleNum.begin(), singleNum.end());
         arr.push_back(BigInt(singleNum));
     }
     inputFile >> num4; // Read the g number
-    reverse(num4.begin(), num4.end());
     BigInt g(num4);
     inputFile.close();
 

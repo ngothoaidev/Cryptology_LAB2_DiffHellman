@@ -63,14 +63,15 @@ public:
         normalize();
     }
 
-    // Constructor from a big-endian hex string (unsigned interpretation)
+// Constructor from a little-endian hex string (file format)
     BigInt(const std::string& hex_str) : neg(false) {
-        if (hex_str.empty()) {
+        std::string little_endian_hex = fromHexToLittleEndian(hex_str); // Convert to little-endian
+        if (little_endian_hex.empty()) {
             limbs.push_back(0);
             return;
         }
         // Each hex char is 4 bits. 16 hex chars = 64 bits (one limb).
-        int len = hex_str.length();
+        int len = little_endian_hex.length();
         int num_limbs = (len + 15) / 16;
         limbs.resize(num_limbs, 0);
 
@@ -80,7 +81,7 @@ public:
 
         // Since the string stores the number in the format of big-endian
         for (int i = len - 1; i >= 0; --i) {
-            char c = hex_str[i];
+            char c = little_endian_hex[i];
             uint64_t val;
             if (c >= '0' && c <= '9') val = c - '0';
             else if (c >= 'a' && c <= 'f') 
@@ -104,7 +105,12 @@ public:
         normalize();
     }
 
-    std::string to_string() const {
+    std::string fromHexToLittleEndian(const std::string& hexStr){
+        return std::string(hexStr.rbegin(), hexStr.rend());
+    }
+
+
+    std::string debug_string() const {
         if (is_zero()) return "0";
         std::ostringstream oss;
         if (neg) oss << "-";
@@ -114,14 +120,28 @@ public:
         return oss.str();
     }
 
-    std::string to_hex_string() const {
+    std::string to_string() const{
+        if (is_zero()) return "0";
         std::ostringstream oss;
-        oss << std::hex << std::uppercase;
-        if (limbs.empty()) return "0";
         if (neg) oss << "-";
-        oss << limbs.back();
-        for (size_t i = limbs.size(); i-- > 1;) {
-            oss << std::setw(16) << std::setfill('0') << limbs[i - 1];
+        BigInt temp = this->abs();
+        std::string res;
+        auto [quotient, remainder] = BigInt::divmod(temp, BigInt(10));
+        while (!temp.is_zero()) {
+            res.push_back('0' + static_cast<char>(remainder.limbs[0]));
+            temp = quotient;
+            std::tie(quotient, remainder) = BigInt::divmod(temp, BigInt(10));
+        }
+        std::reverse(res.begin(), res.end());
+        return oss.str() + res;
+    }
+
+    std::string to_hex_string() const {
+        if (is_zero()) return "0";
+        std::ostringstream oss;
+        if (neg) oss << "-";
+        for (int i = limbs.size() - 1; i >= 0; --i) {
+            oss << std::hex << std::setw(16) << std::setfill('0') << limbs[i];
         }
         return oss.str();
     }
@@ -429,6 +449,31 @@ public:
     BigInt& operator%=(const BigInt& o) { *this = *this % o; return *this; }
 };
 
+// --- GCD ---
+BigInt gcd(BigInt a, BigInt b) {
+    while (!b.is_zero()) {
+        BigInt r = a % b;
+        a = b;
+        b = r;
+    }
+    return a;
+}
+
+BigInt extendGCD(const BigInt& a, const BigInt& b, BigInt& x, BigInt& y) {
+    if (b.is_zero()) {
+        x = BigInt(1);
+        y = BigInt(0);
+        return a;
+    }
+    BigInt x1, y1;
+    BigInt d = extendGCD(b, a % b, x1, y1);
+    x = y1;
+    y = x1 - (a / b) * y1;
+    return d;
+}
+
+
+// --- Modular Exponentiation ---
 BigInt powMod(BigInt base, BigInt exp, const BigInt& mod) {
     BigInt result(1);
     base %= mod;
@@ -444,6 +489,21 @@ BigInt powMod(BigInt base, BigInt exp, const BigInt& mod) {
     }
     return result;
 }
+
+
+// --- Inv Module
+BigInt invMod(const BigInt& a, const BigInt& mod){
+    BigInt x, y;
+    BigInt g = extendGCD(a, mod, x, y);
+    if (g != BigInt(1)) {
+        throw std::runtime_error("Inverse does not exist");
+    } else {
+        x %= mod;
+        if (x.neg) x += mod; // Ensure positive result
+        return x;
+    }
+}
+
 
 
 
