@@ -43,10 +43,11 @@ int main(int argc, char* argv[]) {
     BigInt g(num4);
     inputFile.close();
 
+    BigInt primeMinus1 = prime - BigInt("1"); // p - 1
     // Check if g is a primitive root modulo prime
     for (int i = 0; i < count; i++){
-        BigInt tmp = (prime - BigInt("1")) / arr[i]; // tmp = (p - 1) / k where k is each element in U(prime)
-        if(powMod(g, tmp, prime) == 1){ // If g^tmp mod prime == 1 for any k in U(prime), then g is not a primitive root modulo prime
+        BigInt exp = (primeMinus1) / arr[i]; // exp = (p - 1) / k where k is each element in U(prime)
+        if(powMod(g, exp, prime) == 1){ // If g^exp mod prime == 1 for any k in U(prime), then g is not a primitive root modulo prime
             outputFile << "0" << std::endl;
             outputFile.close();
             return 0;
