@@ -24,27 +24,17 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-
     // Read Data
     std::string num1, num2, num3, num4, num5, num6;
     inputFile >> num1 >> num2 >> num3 >> num4 >> num5 >> num6;
 
     BigInt p(num1); // prime number p
-    BigInt g(num2); // base g
-    BigInt y(num3);
-    BigInt m(num4);
-    BigInt r(num5);
-    BigInt h(num6);
+    BigInt g(num2); // primitive root g
+    BigInt y(num3); // positive integer y
+    BigInt m(num4); // message m
+    BigInt r(num5); // part of the signature r
+    BigInt h(num6); // part of the signature h
     inputFile.close();
-
-    // Output Results
-    std::cout << "Input Data:\n";
-    std::cout << "p: " << p.to_hex_string() << std::endl;
-    std::cout << "g: " << g.to_hex_string() << std::endl;
-    std::cout << "y: " << y.to_hex_string() << std::endl;
-    std::cout << "m: " << m.to_hex_string() << std::endl;
-    std::cout << "r: " << r.to_hex_string() << std::endl;
-    std::cout << "h: " << h.to_hex_string() << std::endl;
 
     if ((r <= 0) || (r >= p) || (h <= 0) || (h >= p) || (m < 0) || (m >= p)) {
         outputFile << "Signature is invalid." << std::endl;
@@ -52,11 +42,11 @@ int main(int argc, char* argv[]) {
         outputFile.close();
         return 0;
     }
-    BigInt gm = powMod(g, m, p);
-    BigInt yr = powMod(y, r, p);
-    BigInt rh = powMod(r, h, p);
-    BigInt v = (yr * rh) % p;
-    bool result = (gm == v);
+    BigInt lhs = powMod(g, m, p);
+    BigInt part1 = powMod(y, r, p);
+    BigInt part2 = powMod(r, h, p);
+    BigInt rhs = (part1 * part2) % p;
+    bool result = (lhs == rhs);
 
     outputFile << result << std::endl;
     outputFile.close();
