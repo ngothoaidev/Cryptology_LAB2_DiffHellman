@@ -36,6 +36,10 @@ int main(int argc, char* argv[]) {
     BigInt b(num4); // Bob's private key b
     inputFile.close();
 
+<<<<<<< HEAD
+=======
+    // // Output Results
+>>>>>>> 960e20e997cc0f0d43e4a2e8f237e75fd4c0594f
     BigInt A = powMod(g, a, p); // A = g^a mod p
     BigInt B = powMod(g, b, p); // B = g^b mod p
     BigInt sharedKeyA = powMod(B, a, p); // sharedKeyA = B^a mod p
@@ -46,9 +50,9 @@ int main(int argc, char* argv[]) {
         std::cerr << "Error: Shared keys do not match!\n";
         return 1;
     }
-    outputFile << A.to_string() << std::endl;
-    outputFile << B.to_string() << std::endl;
-    outputFile << sharedKeyA.to_string() << std::endl;
+    outputFile << convertToLittleEndian(A) << std::endl;
+    outputFile << convertToLittleEndian(B) << std::endl;
+    outputFile << convertToLittleEndian(sharedKeyA) << std::endl;
     outputFile.close();
     return 0;
 }

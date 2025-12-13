@@ -141,7 +141,7 @@ public:
         std::ostringstream oss;
         if (neg) oss << "-";
         for (int i = limbs.size() - 1; i >= 0; --i) {
-            oss << std::hex << std::setw(16) << std::setfill('0') << limbs[i];
+            oss << std::uppercase << std::hex << std::setw(16) << std::setfill('0') << limbs[i];
         }
         return oss.str();
     }
@@ -504,6 +504,20 @@ BigInt invMod(const BigInt& a, const BigInt& mod){
     }
 }
 
+std::string convertToLittleEndian(BigInt& num){
+    std::string hexStr = num.to_hex_string();
+    std::string res = std::string(hexStr.rbegin(), hexStr.rend());
+    // Remove leading zeros
+    // f5 00 00 00 to f5
+    size_t pos = res.find_last_not_of('0');
+    if (pos != std::string::npos) {
+        res = res.substr(0, pos + 1);
+    } else {
+        res = "0";
+    }
+
+    return res;
+}
 
 
 
