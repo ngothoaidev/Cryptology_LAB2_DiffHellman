@@ -43,6 +43,12 @@ int main(int argc, char* argv[]) {
     BigInt g(num4);
     inputFile.close();
 
+    std::cout << "Prime: " << prime.to_string() << std::endl;
+    std::cout << "Count: " << count << std::endl;
+    for(int i = 0; i < count; i++){
+        std::cout << "U(prime)[" << i << "]: " << arr[i].to_string() << std::endl;
+    }
+    std::cout << "g: " << g.to_string() << std::endl;
     // Check if g is a primitive root modulo prime
     for (int i = 0; i < count; i++){
         BigInt tmp = (prime - BigInt("1")) / arr[i]; // tmp = (p - 1) / k where k is each element in U(prime)
