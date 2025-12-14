@@ -65,13 +65,12 @@ public:
 
 // Constructor from a little-endian hex string (file format)
     BigInt(const std::string& hex_str) : neg(false) {
-        std::string little_endian_hex = fromHexToLittleEndian(hex_str); // Convert to little-endian
-        if (little_endian_hex.empty()) {
+        if (hex_str.empty()) {
             limbs.push_back(0);
             return;
         }
         // Each hex char is 4 bits. 16 hex chars = 64 bits (one limb).
-        int len = little_endian_hex.length();
+        int len = hex_str.length();
         int num_limbs = (len + 15) / 16;
         limbs.resize(num_limbs, 0);
 
@@ -80,8 +79,8 @@ public:
         uint64_t current_limb = 0;
 
         // Since the string stores the number in the format of big-endian
-        for (int i = len - 1; i >= 0; --i) {
-            char c = little_endian_hex[i];
+        for (int i = 0; i < len; ++i) {
+            char c = hex_str[i];
             uint64_t val;
             if (c >= '0' && c <= '9') val = c - '0';
             else if (c >= 'a' && c <= 'f') 
@@ -104,11 +103,6 @@ public:
         }
         normalize();
     }
-
-    std::string fromHexToLittleEndian(const std::string& hexStr){
-        return std::string(hexStr.rbegin(), hexStr.rend());
-    }
-
 
     std::string debug_string() const {
         if (is_zero()) return "0";
@@ -449,29 +443,25 @@ public:
     BigInt& operator%=(const BigInt& o) { *this = *this % o; return *this; }
 };
 
-// --- GCD ---
-BigInt gcd(BigInt a, BigInt b) {
-    while (!b.is_zero()) {
-        BigInt r = a % b;
-        a = b;
-        b = r;
-    }
-    return a;
-}
-
 BigInt extendGCD(const BigInt& a, const BigInt& b, BigInt& x, BigInt& y) {
-    if (b.is_zero()) {
-        x = BigInt(1);
-        y = BigInt(0);
-        return a;
+    BigInt m0 = a, n0 = b;
+    BigInt x0 = BigInt(1), y0 = BigInt(0);
+    BigInt x1 = BigInt(0), y1 = BigInt(1);
+    while (n0 != BigInt(0)) {
+        BigInt q = m0 / n0;
+        BigInt r = m0 % n0;
+        BigInt xr = x0 - q * x1, yr = y0 - q * y1;
+        m0 = n0;
+        n0 = r;
+        x0 = x1;
+        y0 = y1;
+        x1 = xr;
+        y1 = yr;
     }
-    BigInt x1, y1;
-    BigInt d = extendGCD(b, a % b, x1, y1);
-    x = y1;
-    y = x1 - (a / b) * y1;
-    return d;
+    x = x0;
+    y = y0;
+    return m0;
 }
-
 
 // --- Modular Exponentiation ---
 BigInt powMod(BigInt base, BigInt exp, const BigInt& mod) {
@@ -490,7 +480,6 @@ BigInt powMod(BigInt base, BigInt exp, const BigInt& mod) {
     return result;
 }
 
-
 // --- Inv Module
 BigInt invMod(const BigInt& a, const BigInt& mod){
     BigInt x, y;
@@ -503,9 +492,5 @@ BigInt invMod(const BigInt& a, const BigInt& mod){
         return x;
     }
 }
-
-
-
-
 
 #endif // BIGINT_H
