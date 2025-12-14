@@ -36,19 +36,12 @@ int main(int argc, char* argv[]) {
     BigInt b(num4); // Bob's private key b
     inputFile.close();
 
-    // Output Results
-    std::cout << "Input Data:\n";
-    std::cout << "p: " << p.to_hex_string() << std::endl;
-    std::cout << "g: " << g.to_hex_string() << std::endl;
-    std::cout << "a: " << a.to_hex_string() << std::endl;
-    std::cout << "b: " << b.to_hex_string() << std::endl;
-
-    // outputFile << p.to_string() << std::endl;
-    // outputFile << a.to_string() << std::endl;
-    // outputFile << b.to_string() << std::endl;
-    // outputFile << g.to_string() << std::endl;
+<<<<<<< HEAD
+=======
+    // // Output Results
+>>>>>>> 960e20e997cc0f0d43e4a2e8f237e75fd4c0594f
     BigInt A = powMod(g, a, p); // A = g^a mod p
-    BigInt B = powMod(g, b, p); // B = g^b
+    BigInt B = powMod(g, b, p); // B = g^b mod p
     BigInt sharedKeyA = powMod(B, a, p); // sharedKeyA = B^a mod p
     BigInt sharedKeyB = powMod(A, b, p); // sharedKeyB = A^b mod p
 
@@ -57,9 +50,9 @@ int main(int argc, char* argv[]) {
         std::cerr << "Error: Shared keys do not match!\n";
         return 1;
     }
-    outputFile << A.to_string() << std::endl;
-    outputFile << B.to_string() << std::endl;
-    outputFile << sharedKeyA.to_string() << std::endl;
+    outputFile << convertToLittleEndian(A) << std::endl;
+    outputFile << convertToLittleEndian(B) << std::endl;
+    outputFile << convertToLittleEndian(sharedKeyA) << std::endl;
     outputFile.close();
     return 0;
 }

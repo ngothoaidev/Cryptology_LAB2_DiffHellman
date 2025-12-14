@@ -135,7 +135,7 @@ public:
         std::ostringstream oss;
         if (neg) oss << "-";
         for (int i = limbs.size() - 1; i >= 0; --i) {
-            oss << std::hex << std::setw(16) << std::setfill('0') << limbs[i];
+            oss << std::uppercase << std::hex << std::setw(16) << std::setfill('0') << limbs[i];
         }
         return oss.str();
     }
